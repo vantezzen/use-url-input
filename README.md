@@ -15,6 +15,9 @@ Often errors are:
 - Default input value is `https://` to help the user enter the URL, but user pastes their URL from somewhere, resulting in `https://https://example.com`
   Solution: Packages removes duplicate `https://` and `http://` from the beginning of the URL
 
+- User mistypes `https://` or `http://` as `htps://` or `https.//` or `htttp://` etc.
+  Solution: Package fixes common misspellings of the protocol
+
 The hook is designed to be unopinionated so it can be used with many form libraries and doesn't provide state on its own.
 
 ## Demo
