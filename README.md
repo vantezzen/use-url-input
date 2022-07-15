@@ -59,27 +59,66 @@ const Example = () => {
 
 Alternatively, you can use the `improveUrl` function to improve a URL directly instead of using a hook. The function will return the improved URL or `null` if no improvements are found.
 
-### Custom rules
+### Custom ruleset
 
-The library uses a set of reuable rules to improve the URL. You can use your own rules by passing in an array of rules as the `rules` argument.
+The library uses a set of reuable rules to improve the URL. Not all rules are enabled by default and you might need to disable a default rule, so you can use your own rules by passing in an array of rules as the `rules` argument.
 
-For example, you can add a rule to ensure that the URL doesn't end with a slash using
+Additionally, the `ruleset` helper function can be used to create a ruleset from a list of rules and rule arrays.
 
 ```tsx
 import * as React from "react";
 
-import useUrlInput, { DEFAULT_RULES } from "use-url-input";
+import useUrlInput, { RULES, DEFAULT_RULES, ruleset } from "use-url-input";
 
-const doesntEndWithSlash = (url: string) => {
-  if (url.endsWith("/")) {
-    return url.slice(0, -1);
+// Use the default ruleset and add a custom rule "doesntEndWithSlash"
+const myRules = ruleset(DEFAULT_RULES, RULES.doesntEndWithSlash);
+
+const Example = () => {
+  const [url, setUrl] = useState("");
+  useUrlInput(url, setUrl, myRules);
+
+  return (
+    <input
+      type="text"
+      value={url}
+      onChange={(e) => setUrl(e.target.value)}
+      placeholder="https://example.com"
+    />
+  );
+};
+```
+
+Available rules are:
+
+- `RULES.ensureProtocol` (part of the default ruleset): Ensures the URL starts with `https://` or `http://`. If the user starts typing a URL without it, this will add it.
+- `RULES.removeDuplicateProtocol` (part of the default ruleset): Removes duplicate `https://` and `http://` from the beginning of the URL.
+- `RULES.doesntEndWithSlash`: Removes the trailing slash from the URL.
+- `RULES.addProtocolIfEmpty`: If the input is completely empty, it will add `https://`.
+- `RULES.ensureHttps`: Replaces `http://` with `https://`. Please keep in mind that some websites may not support HTTPS, resulting in invalid URLs - because of this, the rule is not in the default ruleset.
+
+Please keep in mind that the rules will be executed in the order they are passed in so using a different order may result in multiple render passes.
+
+### Custom rules
+
+The library uses a set of reuable rules to improve the URL. You can use your own rules by passing in an array of rules as the `rules` argument.
+
+For example, you can add a rule to ensure that the URL ends with ".com" using
+
+```tsx
+import * as React from "react";
+
+import useUrlInput, { DEFAULT_RULES, ruleset } from "use-url-input";
+
+const ensureEndsWithDotCom = (url: string) => {
+  if (!url.endsWith(".com")) {
+    return url + ".com";
   }
   return url;
 };
 
 const Example = () => {
   const [url, setUrl] = useState("");
-  useUrlInput(url, setUrl, [...DEFAULT_RULES, doesntEndWithSlash]);
+  useUrlInput(url, setUrl, ruleset(DEFAULT_RULES, ensureEndsWithDotCom));
 
   return (
     <input

@@ -1,6 +1,6 @@
 {
   "name": "use-url-input",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React hook to create user-friendly input for HTTP(s) URLs",
   "author": "vantezzen",
   "license": "MIT",
@@ -9,6 +9,9 @@
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "jsnext:main": "dist/index.es.js",
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=8",
     "npm": ">=5"

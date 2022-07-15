@@ -1,49 +1,58 @@
 import { useEffect } from "react";
 
-export type UrlRule = {
-  name: string;
-  run: (url: string) => string;
+export type UrlRule = (url: string) => string;
+
+export const RULES: { [key: string]: UrlRule } = {
+  ensureHttps: (url: string) => {
+    if (url.startsWith("http://")) {
+      return url.replace("http://", "https://");
+    }
+    return url;
+  },
+  addProtocolIfEmpty: (url: string) => {
+    if (url.length === 0) {
+      return "https://";
+    }
+    return url;
+  },
+  doesntEndWithSlash: (url: string) => {
+    if (url.endsWith("/")) {
+      return url.slice(0, -1);
+    }
+    return url;
+  },
+  removeDuplicateProtocol: (url) => {
+    if (/^(https?:\/\/){2,}/i.test(url)) {
+      return url.replace(/^(https?:\/\/)+(?=https?:\/\/)/i, "");
+    }
+    return url;
+  },
+  ensureProtocol: (url) => {
+    if (url.length > 0) {
+      let beginsWithPossiblePrefix = false;
+      const possiblePrefixes = ["https://", "http://"];
+      for (const prefix of possiblePrefixes) {
+        if (url.startsWith(prefix.substring(0, url.length))) {
+          beginsWithPossiblePrefix = true;
+          break;
+        }
+      }
+      if (!beginsWithPossiblePrefix) {
+        url = possiblePrefixes[0] + url;
+      }
+    }
+    return url;
+  },
 };
 
-export const DEFAULT_RULES: UrlRule[] = [
-  // {
-  //   name: "Add protocol if empty",
-  //   run: (url: string) => {
-  //     if (url.length === 0) {
-  //       return "https://";
-  //     }
-  //     return url;
-  //   },
-  // },
-  {
-    name: "Remove duplicate protocol",
-    run: (url) => {
-      if (/^(https?:\/\/){2,}/i.test(url)) {
-        return url.replace(/^(https?:\/\/)+(?=https?:\/\/)/i, "");
-      }
-      return url;
-    },
-  },
-  {
-    name: "Ensure protocol",
-    run: (url) => {
-      if (url.length > 0) {
-        let beginsWithPossiblePrefix = false;
-        const possiblePrefixes = ["https://", "http://"];
-        for (const prefix of possiblePrefixes) {
-          if (url.startsWith(prefix.substring(0, url.length))) {
-            beginsWithPossiblePrefix = true;
-            break;
-          }
-        }
-        if (!beginsWithPossiblePrefix) {
-          url = possiblePrefixes[0] + url;
-        }
-      }
-      return url;
-    },
-  },
-];
+export function ruleset(...rules: (UrlRule | UrlRule[])[]): UrlRule[] {
+  return rules.flat();
+}
+
+export const DEFAULT_RULES = ruleset(
+  RULES.removeDuplicateProtocol,
+  RULES.ensureProtocol
+);
 
 export function improveUrlInput(
   url: string,
@@ -51,7 +60,7 @@ export function improveUrlInput(
 ): string | null {
   let newUrl = url;
   for (const rule of rules) {
-    newUrl = rule.run(newUrl);
+    newUrl = rule(newUrl);
   }
   if (newUrl === url) {
     return null;

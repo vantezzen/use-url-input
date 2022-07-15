@@ -1,4 +1,4 @@
-import useUrlInput from "./";
+import useUrlInput, { improveUrlInput, ruleset } from "./";
 import { renderHook } from "@testing-library/react-hooks";
 
 const callInputWith = (value: string) => {
@@ -30,5 +30,11 @@ describe("useUrlInput", () => {
     const updateFn = callInputWith("htt");
 
     expect(updateFn).not.toHaveBeenCalled();
+  });
+  it("executes custom rules", () => {
+    const rules = ruleset(() => "ok");
+    const result = improveUrlInput("a", rules);
+
+    expect(result).toBe("ok");
   });
 });
