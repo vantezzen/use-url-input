@@ -1,29 +1,34 @@
-import { useMyHook } from './'
-import { renderHook, act } from "@testing-library/react-hooks";
+import useUrlInput from "./";
+import { renderHook } from "@testing-library/react-hooks";
 
-// mock timer using jest
-jest.useFakeTimers();
+const callInputWith = (value: string) => {
+  const updateFn = jest.fn();
+  renderHook(() => useUrlInput(value, updateFn));
+  return updateFn;
+};
 
-describe('useMyHook', () => {
-  it('updates every second', () => {
-    const { result } = renderHook(() => useMyHook());
+describe("useUrlInput", () => {
+  it("doesn't change valid URLs", () => {
+    const updateFn = callInputWith("https://www.example.com");
 
-    expect(result.current).toBe(0);
+    expect(updateFn).not.toHaveBeenCalled();
+  });
 
-    // Fast-forward 1sec
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+  it("removes duplicate protocols", () => {
+    const updateFn = callInputWith("https://http://https://http://example.com");
 
-    // Check after total 1 sec
-    expect(result.current).toBe(1);
+    expect(updateFn).toHaveBeenCalledWith("http://example.com");
+  });
 
-    // Fast-forward 1 more sec
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+  it("adds protocol if needed", () => {
+    const updateFn = callInputWith("example");
 
-    // Check after total 2 sec
-    expect(result.current).toBe(2);
-  })
-})
+    expect(updateFn).toHaveBeenCalledWith("https://example");
+  });
+
+  it("doesn't add protocol if could be typing protocol", () => {
+    const updateFn = callInputWith("htt");
+
+    expect(updateFn).not.toHaveBeenCalled();
+  });
+});
