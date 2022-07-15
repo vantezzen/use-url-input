@@ -17,6 +17,10 @@ Often errors are:
 
 The hook is designed to be unopinionated so it can be used with many form libraries and doesn't provide state on its own.
 
+## Demo
+
+Visit https://vantezzen.github.io/use-url-input/ for a demo of this library. The example can be found under `example/src/App.js`.
+
 ## Install
 
 ```bash
