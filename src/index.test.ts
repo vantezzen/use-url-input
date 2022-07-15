@@ -37,4 +37,12 @@ describe("useUrlInput", () => {
 
     expect(result).toBe("ok");
   });
+  it("fixes common errors in the protocol", () => {
+    expect(improveUrlInput("htt://example.com")).toBe("http://example.com");
+    expect(improveUrlInput("https.//example.com")).toBe("https://example.com");
+    expect(improveUrlInput("https.////example.com")).toBe(
+      "https://example.com"
+    );
+    expect(improveUrlInput("https:///example.com")).toBe("https://example.com");
+  });
 });
