@@ -20,6 +20,8 @@ Often errors are:
 
 The hook is designed to be unopinionated so it can be used with many form libraries and doesn't provide state on its own.
 
+> The corrected value of the hook isn't guaranteed to be a valid, full URL. Instead it provides help to the user while they type with small corrections - you should still validate the final URL yourself when the user submits or leaves the form.
+
 ## Demo
 
 Visit https://vantezzen.github.io/use-url-input/ for a demo of this library. The example can be found under `example/src/App.js`.
