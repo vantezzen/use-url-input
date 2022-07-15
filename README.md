@@ -90,6 +90,7 @@ const Example = () => {
 
 Available rules are:
 
+- `RULES.fixBrokenProtocol` (part of the default ruleset): Fixes common issues of the URL protocol (e.g. `htps://`, `https.//`, `https:///`)
 - `RULES.ensureProtocol` (part of the default ruleset): Ensures the URL starts with `https://` or `http://`. If the user starts typing a URL without it, this will add it.
 - `RULES.removeDuplicateProtocol` (part of the default ruleset): Removes duplicate `https://` and `http://` from the beginning of the URL.
 - `RULES.doesntEndWithSlash`: Removes the trailing slash from the URL.

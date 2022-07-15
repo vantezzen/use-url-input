@@ -43,6 +43,26 @@ export const RULES: { [key: string]: UrlRule } = {
     }
     return url;
   },
+  fixBrokenProtocol: (url) => {
+    return (
+      url
+        // https.//example.com (. instead of :)
+        .replace(/^https?\.\/\//i, "https://")
+        .replace(/^http\.\/\//i, "http://")
+        // https:/example.com or http:///example.com (not two slashes)
+        .replace(/^https:\/+/, "https://")
+        .replace(/^http:\/+/, "http://")
+        // https//example.com/ (no colon)
+        .replace(/^https\/\//, "https://")
+        .replace(/^http\/\//, "http://")
+        // htps://example.com/ or htttp://example.com/ (wrong number of t)
+        .replace(/^ht+ps:\/\//, "https://")
+        .replace(/^ht+p:\/\//, "http://")
+        // htts://example.com/ (no p)
+        .replace("htts://", "https://")
+        .replace("htt://", "http://")
+    );
+  },
 };
 
 export function ruleset(...rules: (UrlRule | UrlRule[])[]): UrlRule[] {
@@ -50,6 +70,7 @@ export function ruleset(...rules: (UrlRule | UrlRule[])[]): UrlRule[] {
 }
 
 export const DEFAULT_RULES = ruleset(
+  RULES.fixBrokenProtocol,
   RULES.removeDuplicateProtocol,
   RULES.ensureProtocol
 );
